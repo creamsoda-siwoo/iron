@@ -1,0 +1,1 @@
+// Moved to index.html for single-file distribution
