@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>전설의 대장장이: 아이언 & 파이어</title>
+    <title>전설의 대장장이: 영웅의 시대</title>
     
     <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,12 +13,12 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Do+Hyeon&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         body {
             font-family: 'Noto Sans KR', sans-serif;
-            background-color: #1a1a1a;
+            background-color: #000;
             color: #e5e5e5;
             overflow: hidden;
             user-select: none;
@@ -28,430 +28,671 @@
         h1, h2, .font-display {
             font-family: 'Black Han Sans', sans-serif;
         }
-
-        /* Lava Background Animation */
-        @keyframes lava-flow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .bg-lava {
-            background: linear-gradient(-45deg, #3f0e0e, #7f1d1d, #450a0a, #1c1917);
-            background-size: 400% 400%;
-            animation: lava-flow 15s ease infinite;
+        .font-game {
+            font-family: 'Do Hyeon', sans-serif;
         }
 
-        /* Spark Particles */
-        @keyframes fly-spark {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        /* Backgrounds */
+        .bg-main {
+            background: linear-gradient(to bottom, #1a1a1a, #000000);
         }
-        .spark {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: #facc15;
-            border-radius: 50%;
-            pointer-events: none;
-            box-shadow: 0 0 10px #f59e0b;
-            animation: fly-spark 0.8s ease-out forwards;
+        .bg-lava-gradient {
+            background: radial-gradient(circle at 50% 30%, #451a03 0%, #000000 100%);
+        }
+        .bg-dungeon-gradient {
+            background: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #020617 100%);
+        }
+        .bg-artifact-gradient {
+            background: radial-gradient(circle at 50% 50%, #312e81 0%, #0f0c29 100%);
         }
 
-        /* Hammer Hit Effect */
-        @keyframes hit-shake {
-            0% { transform: scale(1) rotate(0deg); }
-            25% { transform: scale(0.95) rotate(-2deg); }
-            50% { transform: scale(1.05) rotate(2deg); }
-            75% { transform: scale(0.98) rotate(-1deg); }
-            100% { transform: scale(1) rotate(0deg); }
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
-        .hit-anim {
-            animation: hit-shake 0.15s ease-in-out;
+        
+        .glass-card {
+            background: linear-gradient(145deg, rgba(30,30,30,0.9), rgba(20,20,20,0.95));
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
-        /* Floating Text */
-        @keyframes floatUpFade {
+        /* Animations */
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+        .shake-anim { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+
+        @keyframes float-up {
             0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-60px) scale(1.2); opacity: 0; }
+            100% { transform: translateY(-80px) scale(1.1); opacity: 0; }
         }
-        .float-text {
-            animation: floatUpFade 0.8s ease-out forwards;
-            position: absolute;
-            pointer-events: none;
-            z-index: 50;
-            text-shadow: 2px 2px 0px #000;
-        }
+        .float-text { animation: float-up 1s ease-out forwards; pointer-events: none; position: absolute; z-index: 100; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 
-        /* Glow Pulse */
-        @keyframes glow-pulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.2); }
-            50% { box-shadow: 0 0 40px rgba(239, 68, 68, 0.6); }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(234, 179, 8, 0.1); }
+            50% { box-shadow: 0 0 30px rgba(234, 179, 8, 0.4); }
         }
-        .glow-box {
-            animation: glow-pulse 2s infinite;
+        
+        @keyframes hit-flash {
+            0% { filter: brightness(1); transform: scale(1); }
+            20% { filter: brightness(2) hue-rotate(-30deg); transform: scale(0.95); }
+            100% { filter: brightness(1); transform: scale(1); }
         }
-
-        /* Progress Bar Shine */
-        .progress-shine {
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
-            background-size: 200% 100%;
-            animation: shine 1s infinite linear;
-        }
-        @keyframes shine {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
+        .hit-effect { animation: hit-flash 0.1s ease-out; }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #292524; }
-        ::-webkit-scrollbar-thumb { background: #78350f; border-radius: 3px; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+        /* Rarity Effects */
+        .rarity-common { border-color: #525252; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        .rarity-rare { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.2), inset 0 0 15px rgba(59, 130, 246, 0.1); }
+        .rarity-epic { border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.3), inset 0 0 20px rgba(168, 85, 247, 0.15); }
+        .rarity-legendary { 
+            border-color: #fbbf24; 
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4), inset 0 0 30px rgba(251, 191, 36, 0.2); 
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(0,0,0,0.8));
+            animation: pulse-glow 2s infinite; 
+        }
+
+        .btn-press {
+            transition: all 0.1s;
+        }
+        .btn-press:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body>
-    <div id="root" class="w-full h-screen overflow-hidden relative bg-lava"></div>
+    <div id="root" class="w-full h-screen overflow-hidden relative bg-main max-w-md mx-auto border-x border-white/5 shadow-2xl"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef, useMemo } = React;
+        const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
-        // --- GAME DATA ---
+        // --- DATA CONSTANTS ---
         const WEAPONS = [
-            { id: 'dagger', name: '녹슨 단검', basePrice: 50, maxHp: 10, icon: '🗡️' },
-            { id: 'sword', name: '강철 롱소드', basePrice: 250, maxHp: 25, icon: '⚔️' },
-            { id: 'axe', name: '전투 도끼', basePrice: 800, maxHp: 50, icon: '🪓' },
-            { id: 'hammer', name: '워해머', basePrice: 2500, maxHp: 100, icon: '🔨' },
-            { id: 'magic_sword', name: '마법 검', basePrice: 8000, maxHp: 250, icon: '🔮' },
-            { id: 'excalibur', name: '엑스칼리버', basePrice: 30000, maxHp: 600, icon: '👑' },
-            { id: 'dragon_slayer', name: '드래곤 슬레이어', basePrice: 100000, maxHp: 1500, icon: '🐲' },
+            { id: 'dagger', name: '녹슨 단검', basePrice: 100, damage: 5, maxHp: 10, icon: '🗡️' },
+            { id: 'sword', name: '강철 검', basePrice: 400, damage: 15, maxHp: 25, icon: '⚔️' },
+            { id: 'axe', name: '전투 도끼', basePrice: 1500, damage: 40, maxHp: 60, icon: '🪓' },
+            { id: 'mace', name: '스파이크 메이스', basePrice: 5000, damage: 100, maxHp: 150, icon: '🔨' },
+            { id: 'greatsword', name: '기사의 대검', basePrice: 15000, damage: 250, maxHp: 400, icon: '🤺' },
+            { id: 'magic_wand', name: '아크메이지 지팡이', basePrice: 60000, damage: 600, maxHp: 1000, icon: '🔮' },
+            { id: 'excalibur', name: '성검 엑스칼리버', basePrice: 250000, damage: 1500, maxHp: 3000, icon: '👑' },
+            { id: 'dragon_slayer', name: '드래곤 슬레이어', basePrice: 1000000, damage: 5000, maxHp: 8000, icon: '🐲' },
         ];
 
-        const UPGRADES = [
-            { id: 'hammer_power', name: '미스릴 망치', baseCost: 100, desc: '클릭 당 단조력 +1', type: 'CLICK', val: 1 },
-            { id: 'auto_goblin', name: '고블린 조수', baseCost: 500, desc: '초당 자동 단조 +2', type: 'AUTO', val: 2 },
-            { id: 'furnace', name: '용암 화로', baseCost: 1500, desc: '판매 가격 +20%', type: 'PROFIT', val: 0.2 },
-            { id: 'skill_crit', name: '정밀 타격', baseCost: 5000, desc: '크리티컬 확률 +5%', type: 'CRIT', val: 5 },
-            { id: 'mastery', name: '대장장이의 혼', baseCost: 20000, desc: '모든 효율 1.5배', type: 'ALL', val: 1.5 },
+        const RARITY = {
+            COMMON: { name: '일반', mult: 1, color: 'text-gray-400', border: 'rarity-common', bg: 'bg-gray-900/50', chance: 0.6 },
+            RARE: { name: '희귀', mult: 2, color: 'text-blue-400', border: 'rarity-rare', bg: 'bg-blue-900/30', chance: 0.3 },
+            EPIC: { name: '영웅', mult: 5, color: 'text-purple-400', border: 'rarity-epic', bg: 'bg-purple-900/30', chance: 0.09 },
+            LEGENDARY: { name: '전설', mult: 15, color: 'text-yellow-400', border: 'rarity-legendary', bg: 'bg-yellow-900/30', chance: 0.01 },
+        };
+
+        const HEROES = [
+            { id: 'warrior', name: '견습 전사', baseCost: 1000, baseDps: 2, icon: '🛡️', desc: '방패를 든 든든한 전사입니다.' },
+            { id: 'archer', name: '엘프 궁수', baseCost: 5000, baseDps: 8, icon: '🏹', desc: '멀리서 적을 저격합니다.' },
+            { id: 'mage', name: '화염 마법사', baseCost: 20000, baseDps: 25, icon: '🔥', desc: '강력한 화염구를 날립니다.' },
+            { id: 'paladin', name: '성기사', baseCost: 100000, baseDps: 80, icon: '⛪', desc: '신성한 힘으로 적을 심판합니다.' },
         ];
+
+        const MONSTERS = ['🐀', '🦇', '💀', '🐺', '🧟', '🕷️', '🦂', '🐍', '👺', '👹', '🐲', '👿'];
+
+        // --- HELPER FUNCTIONS ---
+        const formatNum = (num) => {
+            if (num >= 100000000) return (num / 100000000).toFixed(2) + '억';
+            if (num >= 10000) return (num / 10000).toFixed(1) + '만';
+            return Math.floor(num).toLocaleString();
+        };
+
+        const getRarity = (luck = 1) => {
+            const r = Math.random();
+            if (r < RARITY.LEGENDARY.chance * luck) return 'LEGENDARY';
+            if (r < (RARITY.LEGENDARY.chance + RARITY.EPIC.chance) * luck) return 'EPIC';
+            if (r < (RARITY.LEGENDARY.chance + RARITY.EPIC.chance + RARITY.RARE.chance) * luck) return 'RARE';
+            return 'COMMON';
+        };
 
         // --- COMPONENTS ---
 
-        // Spark Effect Component
-        const Sparks = ({ sparks }) => {
-            return (
-                <>
-                    {sparks.map(spark => (
-                        <div 
-                            key={spark.id}
-                            className="spark"
-                            style={{
-                                left: spark.x,
-                                top: spark.y,
-                                '--tx': `${spark.tx}px`,
-                                '--ty': `${spark.ty}px`,
-                                background: spark.color
-                            }}
-                        />
-                    ))}
-                </>
-            );
-        };
+        const FloatingTexts = ({ texts }) => (
+            <>
+                {texts.map(t => (
+                    <div key={t.id} className={`float-text font-game ${t.color} ${t.size}`} style={{ left: t.x, top: t.y }}>
+                        {t.text}
+                    </div>
+                ))}
+            </>
+        );
 
         const App = () => {
-            // Game State
+            // --- STATE ---
+            const [tab, setTab] = useState('SMITH'); // SMITH, DUNGEON, ARTIFACT
             const [gold, setGold] = useState(0);
-            const [weaponIdx, setWeaponIdx] = useState(0);
-            const [progress, setProgress] = useState(0); // Current HP damage to weapon
-            const [upgrades, setUpgrades] = useState(UPGRADES.map(u => ({...u, level: 0})));
+            const [soulStones, setSoulStones] = useState(0);
             
-            // Visual State
-            const [sparks, setSparks] = useState([]);
+            // Smithy
+            const [weaponIdx, setWeaponIdx] = useState(0);
+            const [smithProgress, setSmithProgress] = useState(0);
+            const [inventory, setInventory] = useState([]);
+            const [clickLevel, setClickLevel] = useState(1);
+            const [autoSmithLevel, setAutoSmithLevel] = useState(0);
+            
+            // Dungeon
+            // First hero starts at Level 1 (Hired by default)
+            const [heroes, setHeroes] = useState(HEROES.map((h, i) => ({ ...h, level: i === 0 ? 1 : 0, equipped: null })));
+            const [stage, setStage] = useState(1);
+            const [monsterHp, setMonsterHp] = useState(100);
+            const [maxMonsterHp, setMaxMonsterHp] = useState(100);
+            const [isFighting, setIsFighting] = useState(true);
+            
+            // Visuals
             const [floatingTexts, setFloatingTexts] = useState([]);
-            const [isHit, setIsHit] = useState(false);
-            const [combo, setCombo] = useState(0);
-            const comboTimerRef = useRef(null);
+            const [monsterHit, setMonsterHit] = useState(false);
+            const [anvilHit, setAnvilHit] = useState(false);
 
-            // Stats
+            // Artifacts
+            const [artifacts, setArtifacts] = useState({
+                luck: 0, goldGain: 0, dps: 0,
+            });
+
             const currentWeapon = WEAPONS[weaponIdx];
-            const clickPower = 1 + (upgrades.find(u => u.id === 'hammer_power').level * 1.5);
-            const autoPower = upgrades.find(u => u.id === 'auto_goblin').level * 3;
-            const profitMult = 1 + (upgrades.find(u => u.id === 'furnace').level * 0.2);
-            const critChance = upgrades.find(u => u.id === 'skill_crit').level * 5;
-            const mastery = 1 + (upgrades.find(u => u.id === 'mastery').level * 0.5);
+            const clickPower = clickLevel * 2 * (1 + artifacts.dps * 0.1);
+            const luckMultiplier = 1 + (artifacts.luck * 0.1);
+            const goldMultiplier = 1 + (artifacts.goldGain * 0.1);
+            
+            const totalHeroDps = useMemo(() => {
+                return heroes.reduce((acc, hero) => {
+                    if (hero.level === 0) return acc;
+                    let heroDps = hero.baseDps * hero.level;
+                    if (hero.equipped) heroDps += hero.equipped.damage;
+                    return acc + heroDps;
+                }, 0) * (1 + artifacts.dps * 0.2);
+            }, [heroes, artifacts]);
 
-            // Calculated
-            const finalClickPower = clickPower * mastery;
-            const finalAutoPower = autoPower * mastery;
-
-            // Helpers
-            const addSpark = (x, y, amount = 5) => {
-                const newSparks = [];
-                for(let i=0; i<amount; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const dist = 50 + Math.random() * 100;
-                    newSparks.push({
-                        id: Date.now() + Math.random(),
-                        x, y,
-                        tx: Math.cos(angle) * dist,
-                        ty: Math.sin(angle) * dist - 50, // Slightly up
-                        color: Math.random() > 0.7 ? '#ffffff' : '#f59e0b'
-                    });
-                }
-                setSparks(prev => [...prev, ...newSparks]);
-                setTimeout(() => {
-                    setSparks(prev => prev.slice(amount));
-                }, 800);
-            };
-
-            const addFloatingText = (x, y, text, color = 'text-white', size = 'text-2xl') => {
+            // --- ACTIONS ---
+            const addText = (x, y, text, color='text-white', size='text-xl') => {
                 const id = Date.now() + Math.random();
                 setFloatingTexts(prev => [...prev, { id, x, y, text, color, size }]);
-                setTimeout(() => {
-                    setFloatingTexts(prev => prev.filter(t => t.id !== id));
-                }, 800);
+                setTimeout(() => setFloatingTexts(prev => prev.filter(t => t.id !== id)), 1000);
             };
 
-            const completeWeapon = () => {
-                // Reward
-                const earnings = Math.floor(currentWeapon.basePrice * profitMult * mastery);
-                setGold(g => g + earnings);
-                
-                // Visuals
-                addFloatingText(window.innerWidth/2, window.innerHeight/2 - 100, `+${earnings.toLocaleString()} G`, 'text-yellow-400', 'text-4xl');
-                
-                // Progression logic
-                if (weaponIdx < WEAPONS.length - 1) {
-                    // Simple logic: every 5 crafts, unlock next weapon tier (simulated)
-                    // For this demo, let's just say chance to upgrade or based on gold accumulation?
-                    // Let's stick to: if you have enough money for next upgrade, maybe show hint.
-                    // Actually, let's auto-upgrade weapon tier if you have crafted X times?
-                    // For simplicity: Manual button to "Next Level Area" or just cycle?
-                    // Let's keep it simple: If you crafted 10 times, unlock next.
-                }
-                setProgress(0);
-            };
+            const hitAnvil = (amount, isAuto = false) => {
+                if (!isAuto) setAnvilHit(true);
+                setTimeout(() => setAnvilHit(false), 50);
 
-            // Weapon Unlock Check
-            const craftedCountRef = useRef(0);
-            const checkWeaponUnlock = () => {
-                craftedCountRef.current += 1;
-                if (craftedCountRef.current >= 5 && weaponIdx < WEAPONS.length - 1) {
-                    setWeaponIdx(prev => prev + 1);
-                    craftedCountRef.current = 0;
-                    addFloatingText(window.innerWidth/2, window.innerHeight/3, "NEW WEAPON UNLOCKED!", "text-purple-400", "text-3xl");
-                }
-            };
-
-            // Hit Logic
-            const hit = (power, x, y, isAuto = false) => {
-                let damage = power;
-                let isCrit = false;
-
-                // Crit check
-                if (!isAuto && Math.random() * 100 < critChance) {
-                    damage *= 2;
-                    isCrit = true;
-                }
-
-                setProgress(prev => {
-                    const next = prev + damage;
+                setSmithProgress(prev => {
+                    const next = prev + amount;
                     if (next >= currentWeapon.maxHp) {
-                        completeWeapon();
-                        if (!isAuto) checkWeaponUnlock();
+                        const rarityKey = getRarity(luckMultiplier);
+                        const rarity = RARITY[rarityKey];
+                        const newWeapon = {
+                            ...currentWeapon,
+                            uid: Date.now() + Math.random(),
+                            rarity: rarityKey,
+                            price: Math.floor(currentWeapon.basePrice * rarity.mult * goldMultiplier),
+                            damage: Math.floor(currentWeapon.damage * rarity.mult),
+                            upgradeLevel: 0 // New: Upgrade Level
+                        };
+                        
+                        setInventory(inv => [newWeapon, ...inv].slice(0, 30));
+                        if (!isAuto) addText(window.innerWidth/2, window.innerHeight/3, `${rarity.name} 성공!`, rarity.color, 'text-3xl font-bold');
                         return 0;
                     }
                     return next;
                 });
-
+                
                 if (!isAuto) {
-                    // Visuals for click
-                    setIsHit(true);
-                    setTimeout(() => setIsHit(false), 100);
-                    addSpark(x, y);
-                    
-                    const text = isCrit ? "CRITICAL!" : `+${Math.floor(damage)}`;
-                    const color = isCrit ? "text-red-500" : "text-orange-200";
-                    addFloatingText(x, y - 50, text, color, isCrit ? "text-3xl font-bold" : "text-xl");
-
-                    // Combo
-                    setCombo(c => c + 1);
-                    if (comboTimerRef.current) clearTimeout(comboTimerRef.current);
-                    comboTimerRef.current = setTimeout(() => setCombo(0), 2000);
+                    const x = window.innerWidth/2 + (Math.random()*60 - 30);
+                    const y = window.innerHeight/2 - 50;
+                    addText(x, y, `+${Math.floor(amount)}`, 'text-orange-300', 'text-2xl');
                 }
             };
 
-            // Auto Loop
+            const sellWeapon = (e, item) => {
+                e.stopPropagation();
+                const sellPrice = item.price * 5; // Bonus multiplier for selling
+                setGold(g => g + sellPrice);
+                setInventory(inv => inv.filter(i => i.uid !== item.uid));
+                addText(e.clientX, e.clientY, `+${formatNum(sellPrice)} G`, 'text-yellow-400 font-bold');
+            };
+
+            const upgradeWeapon = (e, item) => {
+                e.stopPropagation();
+                const cost = Math.floor(item.price * 0.5 * (item.upgradeLevel + 1));
+                
+                if (gold < cost) {
+                    addText(e.clientX, e.clientY, "골드 부족!", "text-red-500");
+                    return;
+                }
+
+                setGold(g => g - cost);
+                setInventory(inv => inv.map(i => {
+                    if (i.uid === item.uid) {
+                        const newDmg = Math.floor(i.damage * 1.2);
+                        const newPrice = Math.floor(i.price * 1.1);
+                        return { 
+                            ...i, 
+                            damage: newDmg, 
+                            price: newPrice,
+                            upgradeLevel: i.upgradeLevel + 1 
+                        };
+                    }
+                    return i;
+                }));
+                
+                // Update equipped weapon if this item is equipped
+                setHeroes(prev => prev.map(h => {
+                    if (h.equipped && h.equipped.uid === item.uid) {
+                        return {
+                            ...h,
+                            equipped: {
+                                ...h.equipped,
+                                damage: Math.floor(h.equipped.damage * 1.2),
+                                price: Math.floor(h.equipped.price * 1.1),
+                                upgradeLevel: h.equipped.upgradeLevel + 1
+                            }
+                        };
+                    }
+                    return h;
+                }));
+
+                addText(e.clientX, e.clientY, "강화 성공!", "text-cyan-400 font-bold");
+            };
+
+            const equipWeapon = (e, item) => {
+                e.stopPropagation();
+                const candidates = heroes.map((h, i) => ({h, i})).filter(Wrapper => Wrapper.h.level > 0);
+                let equipped = false;
+                const newHeroes = [...heroes];
+
+                // Sort candidates by who benefits most (weakest weapon first)
+                candidates.sort((a, b) => {
+                    const dmgA = a.h.equipped ? a.h.equipped.damage : 0;
+                    const dmgB = b.h.equipped ? b.h.equipped.damage : 0;
+                    return dmgA - dmgB;
+                });
+
+                for (let cand of candidates) {
+                    const hero = cand.h;
+                    const currentDmg = hero.equipped ? hero.equipped.damage : 0;
+                    if (item.damage > currentDmg) {
+                        newHeroes[cand.i].equipped = item;
+                        setHeroes(newHeroes);
+                        setInventory(inv => inv.filter(i => i.uid !== item.uid));
+                        addText(e.clientX, e.clientY, `${hero.name} 장착!`, 'text-green-400 font-bold');
+                        equipped = true;
+                        break;
+                    }
+                }
+                if (!equipped) {
+                    addText(window.innerWidth/2, window.innerHeight/2, "장착 가능한 영웅 없음!", "text-red-400");
+                }
+            };
+
             useEffect(() => {
-                if (finalAutoPower <= 0) return;
                 const interval = setInterval(() => {
-                    hit(finalAutoPower / 10, window.innerWidth/2, window.innerHeight/2, true);
+                    if (autoSmithLevel > 0) hitAnvil(autoSmithLevel * 2, true);
+
+                    if (totalHeroDps > 0 && isFighting) {
+                        setMonsterHp(prev => {
+                            const damage = totalHeroDps * 0.1;
+                            const next = prev - damage;
+                            if (next <= 0) {
+                                const dropSoul = Math.random() < 0.1 ? 1 : 0;
+                                if (dropSoul) {
+                                    setSoulStones(s => s + 1 * stage);
+                                    addText(window.innerWidth - 50, 60, `+${stage} 영혼석`, 'text-purple-400', 'text-xl');
+                                }
+                                const reward = Math.floor(maxMonsterHp * 0.75 * goldMultiplier); // 5x Boosted Reward formula
+                                setGold(g => g + reward);
+                                const nextStage = stage + 1;
+                                setStage(nextStage);
+                                const nextMaxHp = Math.floor(100 * Math.pow(1.5, nextStage - 1));
+                                setMaxMonsterHp(nextMaxHp);
+                                return nextMaxHp;
+                            }
+                            setMonsterHit(true);
+                            setTimeout(() => setMonsterHit(false), 100);
+                            return next;
+                        });
+                    }
                 }, 100);
                 return () => clearInterval(interval);
-            }, [finalAutoPower, weaponIdx, profitMult]); // Deps needed for calculation inside hit logic closure if not using refs
-
-            // UseRefs for stable closures in interval if needed, but state updates are functional so okay.
-            // Re-creating interval on dependency change is fine for this scale.
-
-            const handleAnvilClick = (e) => {
-                hit(finalClickPower, e.clientX, e.clientY);
-            };
-
-            const buyUpgrade = (idx) => {
-                const u = upgrades[idx];
-                const cost = Math.floor(u.baseCost * Math.pow(1.6, u.level));
-                if (gold >= cost) {
-                    setGold(g => g - cost);
-                    setUpgrades(prev => {
-                        const next = [...prev];
-                        next[idx].level += 1;
-                        return next;
-                    });
-                    addFloatingText(window.innerWidth/2, window.innerHeight - 200, "UPGRADED!", "text-green-400");
-                }
-            };
+            }, [autoSmithLevel, totalHeroDps, stage, maxMonsterHp, currentWeapon, goldMultiplier, isFighting]);
 
             return (
-                <div className="w-full h-full flex flex-col relative text-white">
-                    
+                <div className={`w-full h-full flex flex-col relative transition-all duration-700
+                    ${tab === 'SMITH' ? 'bg-lava-gradient' : tab === 'DUNGEON' ? 'bg-dungeon-gradient' : 'bg-artifact-gradient'}
+                `}>
                     {/* HEADER */}
-                    <div className="z-20 p-4 flex justify-between items-start bg-gradient-to-b from-black/80 to-transparent h-24">
-                        <div>
-                            <h1 className="text-3xl text-orange-500 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] font-display">
-                                아이언 & 파이어
-                            </h1>
-                            <div className="text-xs text-gray-400">전설의 대장장이</div>
+                    <div className="h-20 pt-2 pb-2 px-4 shrink-0 z-30 flex justify-between items-start bg-gradient-to-b from-black/90 to-transparent">
+                        {/* Resources */}
+                        <div className="flex flex-col gap-1">
+                            <div className="glass-panel px-3 py-1 rounded-full flex items-center gap-2 min-w-[120px]">
+                                <span className="text-xl filter drop-shadow-lg">💎</span>
+                                <span className="text-purple-300 font-game font-bold text-lg tracking-wide">{formatNum(soulStones)}</span>
+                            </div>
+                            <div className="glass-panel px-3 py-1 rounded-full flex items-center gap-2 min-w-[140px]">
+                                <span className="text-xl filter drop-shadow-lg">💰</span>
+                                <span className="text-yellow-400 font-game font-bold text-lg tracking-wide">{formatNum(gold)}</span>
+                            </div>
                         </div>
+
+                        {/* Title / Stage Info */}
                         <div className="text-right">
-                            <div className="text-3xl font-bold text-yellow-400 font-mono drop-shadow-md">
-                                {Math.floor(gold).toLocaleString()} G
+                            <div className="text-xs text-gray-400 font-display uppercase tracking-widest mb-1">
+                                {tab === 'SMITH' ? 'BLACKSMITH' : tab === 'DUNGEON' ? 'DUNGEON' : 'ARTIFACTS'}
                             </div>
-                            <div className="text-sm text-orange-300">
-                                초당 제작: {finalAutoPower.toFixed(1)} / 클릭: {finalClickPower.toFixed(1)}
-                            </div>
+                            {tab === 'DUNGEON' && (
+                                <div className="text-red-500 font-black font-display text-2xl drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+                                    STAGE {stage}
+                                </div>
+                            )}
+                            {tab === 'SMITH' && (
+                                <div className="text-orange-500 font-black font-display text-xl drop-shadow-md">
+                                    Lv.{weaponIdx+1} {currentWeapon.name}
+                                </div>
+                            )}
                         </div>
                     </div>
 
-                    {/* MAIN GAME AREA */}
-                    <div className="flex-1 relative flex flex-col items-center justify-center perspective-1000">
+                    {/* MAIN CONTENT */}
+                    <div className="flex-1 relative overflow-hidden flex flex-col">
                         
-                        {/* Combo Counter */}
-                        {combo > 1 && (
-                            <div className="absolute top-10 text-4xl font-black italic text-red-500 animate-bounce drop-shadow-lg z-10">
-                                {combo} COMBO!
+                        {/* --- TAB: SMITHY --- */}
+                        {tab === 'SMITH' && (
+                            <>
+                                <div className="flex-1 flex flex-col items-center justify-center relative">
+                                    {/* Heat Gauge */}
+                                    <div className="w-64 mb-8 relative">
+                                        <div className="h-6 bg-gray-900 rounded-full border-2 border-gray-700 overflow-hidden relative shadow-inner">
+                                            <div 
+                                                className="h-full bg-gradient-to-r from-red-600 via-orange-500 to-yellow-400 transition-all duration-100"
+                                                style={{ width: `${(smithProgress / currentWeapon.maxHp) * 100}%` }}
+                                            ></div>
+                                            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNCIgaGVpZ2h0PSI0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxjaXJjbGUgY3g9IjIiIGN5PSIyIiByPSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMikiLz48L3N2Zz4=')] opacity-30"></div>
+                                        </div>
+                                        <div className="text-center text-xs font-bold text-orange-300 mt-1 drop-shadow-md">
+                                            제작 진행도 {Math.floor((smithProgress / currentWeapon.maxHp) * 100)}%
+                                        </div>
+                                    </div>
+
+                                    {/* The Anvil */}
+                                    <button 
+                                        className={`relative group outline-none transition-transform duration-75 ${anvilHit ? 'scale-95' : 'hover:scale-105'}`}
+                                        onClick={() => hitAnvil(clickPower)}
+                                    >
+                                        <div className="absolute inset-0 bg-orange-500 rounded-full blur-[60px] opacity-20 group-active:opacity-40 transition-opacity"></div>
+                                        <div className="w-48 h-48 rounded-full bg-gradient-to-br from-neutral-800 to-neutral-950 border-4 border-neutral-700 shadow-[0_0_50px_rgba(0,0,0,0.5)] flex items-center justify-center relative overflow-hidden">
+                                            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/black-scales.png')] opacity-50"></div>
+                                            <span className="text-8xl drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] z-10 relative group-active:translate-y-1 transition-transform">
+                                                {currentWeapon.icon}
+                                            </span>
+                                            {/* Sparkles */}
+                                            {anvilHit && <div className="absolute inset-0 bg-white/10 z-20 animate-pulse"></div>}
+                                        </div>
+                                        <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-gray-400 text-sm font-game whitespace-nowrap bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm">
+                                            클릭 파워: <span className="text-orange-400">{formatNum(clickPower)}</span>
+                                        </div>
+                                    </button>
+
+                                    {/* Upgrades Mini Bar */}
+                                    <div className="w-full px-4 mt-8 grid grid-cols-3 gap-2">
+                                        {[
+                                            { label: '망치 강화', lv: clickLevel, cost: Math.floor(100 * Math.pow(1.5, clickLevel)), act: () => { if (gold >= Math.floor(100 * Math.pow(1.5, clickLevel))) { setGold(g=>g-Math.floor(100 * Math.pow(1.5, clickLevel))); setClickLevel(l=>l+1); }}},
+                                            { label: '자동 제작', lv: autoSmithLevel, cost: Math.floor(500 * Math.pow(1.6, autoSmithLevel)), act: () => { if (gold >= Math.floor(500 * Math.pow(1.6, autoSmithLevel))) { setGold(g=>g-Math.floor(500 * Math.pow(1.6, autoSmithLevel))); setAutoSmithLevel(l=>l+1); }}},
+                                            { label: '다음 무기', lv: weaponIdx+1, cost: currentWeapon.basePrice * 10, act: () => { if (weaponIdx < WEAPONS.length - 1 && gold >= currentWeapon.basePrice * 10) { setGold(g=>g-currentWeapon.basePrice*10); setWeaponIdx(i=>i+1); setSmithProgress(0); }}}
+                                        ].map((upg, i) => (
+                                            <button key={i} onClick={upg.act} className="glass-panel p-2 rounded-lg flex flex-col items-center active:scale-95 transition-transform btn-press hover:bg-white/5">
+                                                <span className="text-[10px] text-gray-400 mb-1">{upg.label}</span>
+                                                <span className="text-yellow-400 font-game font-bold text-sm">
+                                                    {upg.label === '다음 무기' && upg.lv === WEAPONS.length ? 'MAX' : formatNum(upg.cost)}
+                                                </span>
+                                                <span className="text-[10px] text-gray-500">Lv.{upg.lv}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Inventory Sheet */}
+                                <div className="h-[35%] bg-[#121212] rounded-t-3xl border-t border-white/10 shadow-[0_-10px_40px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden z-20 relative">
+                                    <div className="p-3 bg-white/5 border-b border-white/5 flex justify-between items-center backdrop-blur-sm">
+                                        <span className="text-sm font-bold text-gray-300 flex items-center gap-2">
+                                            📦 인벤토리 <span className="bg-black/50 px-2 py-0.5 rounded text-xs text-gray-500">{inventory.length}/30</span>
+                                        </span>
+                                        <span className="text-xs text-orange-400 animate-pulse">영웅에게 무기를 장착하세요!</span>
+                                    </div>
+                                    <div className="flex-1 overflow-y-auto p-3 grid grid-cols-2 gap-2 content-start pb-20">
+                                        {inventory.length === 0 && (
+                                            <div className="col-span-2 text-center py-10 text-gray-600 text-sm">
+                                                무기를 제작하여 이곳에 채우세요.
+                                            </div>
+                                        )}
+                                        {inventory.map((item) => {
+                                            const upgradeCost = Math.floor(item.price * 0.5 * (item.upgradeLevel + 1));
+                                            return (
+                                                <div key={item.uid} 
+                                                    className={`relative p-2 rounded-lg border ${RARITY[item.rarity].border} ${RARITY[item.rarity].bg} flex flex-col gap-1 group hover:brightness-110 transition-all`}
+                                                >
+                                                    <div className="flex justify-between items-start">
+                                                        <div className="text-2xl drop-shadow-md">{item.icon}</div>
+                                                        <div className={`text-[10px] px-1.5 rounded font-bold bg-black/40 ${RARITY[item.rarity].color}`}>
+                                                            {RARITY[item.rarity].name}
+                                                        </div>
+                                                    </div>
+                                                    <div className="font-bold text-gray-200 text-xs truncate">
+                                                        {item.name} 
+                                                        {item.upgradeLevel > 0 && <span className="text-cyan-400"> (+{item.upgradeLevel})</span>}
+                                                    </div>
+                                                    <div className="text-[10px] text-gray-400">공격력 {formatNum(item.damage)}</div>
+                                                    
+                                                    <div className="grid grid-cols-3 gap-1 mt-1">
+                                                        <button onClick={(e) => equipWeapon(e, item)} className="bg-green-900/80 text-green-300 text-[10px] py-1 rounded hover:bg-green-800 btn-press">장착</button>
+                                                        <button onClick={(e) => upgradeWeapon(e, item)} className="bg-cyan-900/80 text-cyan-300 text-[10px] py-1 rounded hover:bg-cyan-800 btn-press flex flex-col items-center leading-none justify-center">
+                                                            <span>강화</span>
+                                                            <span className="text-[8px] opacity-70">{formatNum(upgradeCost)}</span>
+                                                        </button>
+                                                        <button onClick={(e) => sellWeapon(e, item)} className="bg-yellow-900/80 text-yellow-300 text-[10px] py-1 rounded hover:bg-yellow-800 btn-press">판매</button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {/* --- TAB: DUNGEON --- */}
+                        {tab === 'DUNGEON' && (
+                            <div className="flex-1 flex flex-col p-4 overflow-hidden">
+                                {/* Battle View */}
+                                <div className="h-[45%] w-full rounded-2xl relative overflow-hidden shadow-2xl border border-white/10 bg-black">
+                                    {/* Dynamic Background */}
+                                    <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]"></div>
+                                    
+                                    {/* Monster */}
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+                                        <div className={`text-[8rem] transition-all duration-100 filter drop-shadow-[0_0_15px_rgba(255,0,0,0.3)] ${monsterHit ? 'hit-effect' : 'animate-bounce'}`} style={{ animationDuration: '2s' }}>
+                                            {MONSTERS[(stage - 1) % MONSTERS.length]}
+                                        </div>
+                                    </div>
+
+                                    {/* Monster HUD */}
+                                    <div className="absolute top-4 left-0 right-0 px-8 z-20 flex flex-col items-center">
+                                        <div className="text-xs text-red-400 font-bold mb-1 tracking-widest">BOSS HP</div>
+                                        <div className="w-full h-3 bg-gray-900 rounded-full border border-gray-700 overflow-hidden shadow-lg">
+                                            <div className="h-full bg-red-600 transition-all duration-200 shadow-[0_0_10px_rgba(220,38,38,0.8)]" style={{ width: `${(monsterHp / maxMonsterHp) * 100}%` }}></div>
+                                        </div>
+                                        <div className="text-[10px] text-white font-bold mt-1 drop-shadow-md">{formatNum(monsterHp)} / {formatNum(maxMonsterHp)}</div>
+                                    </div>
+
+                                    {/* Heroes */}
+                                    <div className="absolute bottom-0 w-full h-24 bg-gradient-to-t from-black/80 to-transparent z-20 flex items-end justify-center pb-4 gap-6">
+                                        {heroes.filter(h => h.level > 0).map(h => (
+                                            <div key={h.id} className="relative group">
+                                                <div className="text-4xl transform transition-transform group-hover:-translate-y-1">
+                                                    {h.icon}
+                                                </div>
+                                                {h.equipped && (
+                                                    <div className="absolute -top-2 -right-2 text-sm bg-gray-900 rounded-full border border-yellow-600 w-6 h-6 flex items-center justify-center z-10">
+                                                        {h.equipped.icon}
+                                                    </div>
+                                                )}
+                                                {isFighting && <div className="absolute top-0 left-1/2 w-0.5 h-20 bg-white/10 -translate-x-1/2 animate-pulse"></div>}
+                                            </div>
+                                        ))}
+                                        {heroes.every(h => h.level === 0) && <div className="text-sm text-gray-500 pb-2">영웅을 고용하세요!</div>}
+                                    </div>
+                                    
+                                    {/* DPS Overlay */}
+                                    <div className="absolute top-4 right-4 bg-black/40 backdrop-blur px-2 py-1 rounded border border-white/10 z-20">
+                                        <div className="text-[10px] text-gray-400">TOTAL DPS</div>
+                                        <div className="text-sm font-bold text-white">{formatNum(totalHeroDps)}</div>
+                                    </div>
+                                </div>
+
+                                {/* Heroes List */}
+                                <div className="flex-1 mt-4 overflow-y-auto pb-20 px-1">
+                                    <h3 className="text-gray-400 font-bold text-sm mb-2 ml-1">⚔️ 영웅 관리</h3>
+                                    <div className="space-y-3">
+                                        {heroes.map((hero, idx) => {
+                                            const cost = Math.floor(hero.baseCost * Math.pow(1.4, hero.level));
+                                            const canHire = gold >= cost;
+                                            const currentDps = hero.baseDps * (hero.level || 1) + (hero.equipped?.damage || 0);
+
+                                            return (
+                                                <div key={hero.id} className={`glass-card p-3 rounded-xl flex items-center gap-3 ${hero.level === 0 ? 'opacity-70 grayscale' : ''}`}>
+                                                    <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center text-2xl border border-gray-600 shadow-inner shrink-0">
+                                                        {hero.icon}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-2 mb-0.5">
+                                                            <span className="font-bold text-gray-200">{hero.name}</span>
+                                                            <span className="text-xs text-yellow-500 bg-yellow-900/30 px-1.5 rounded">Lv.{hero.level}</span>
+                                                        </div>
+                                                        <div className="text-[10px] text-gray-400 truncate mb-1">{hero.desc}</div>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-xs text-red-300 font-game">DPS {formatNum(currentDps)}</span>
+                                                            {hero.equipped && (
+                                                                <span className={`text-[10px] px-1.5 rounded border ${RARITY[hero.equipped.rarity].color} ${RARITY[hero.equipped.rarity].border} bg-black/50 truncate max-w-[100px]`}>
+                                                                    {hero.equipped.icon} {hero.equipped.name} (+{hero.equipped.upgradeLevel})
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <button 
+                                                        onClick={() => {
+                                                            if (canHire) {
+                                                                setGold(g => g - cost);
+                                                                setHeroes(prev => {
+                                                                    const next = [...prev];
+                                                                    next[idx].level += 1;
+                                                                    return next;
+                                                                });
+                                                            }
+                                                        }}
+                                                        className={`flex flex-col items-center justify-center w-20 py-1.5 rounded-lg border transition-all btn-press ${canHire ? 'bg-blue-600 border-blue-400 text-white shadow-lg shadow-blue-900/50' : 'bg-gray-800 border-gray-700 text-gray-500'}`}
+                                                    >
+                                                        <span className="text-xs font-bold">{hero.level === 0 ? '고용' : '레벨업'}</span>
+                                                        <span className="text-[10px] font-game mt-0.5">💰 {formatNum(cost)}</span>
+                                                    </button>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
                             </div>
                         )}
 
-                        {/* Weapon Display */}
-                        <div className="mb-8 relative">
-                            <div className="text-8xl filter drop-shadow-[0_0_20px_rgba(255,165,0,0.6)] transform transition-all duration-300 hover:scale-110">
-                                {currentWeapon.icon}
-                            </div>
-                            <div className="text-center mt-4 font-bold text-xl text-orange-200">
-                                {currentWeapon.name} <span className="text-sm text-gray-500">(Lv.{weaponIdx + 1})</span>
-                            </div>
-                        </div>
-
-                        {/* Progress Bar */}
-                        <div className="w-64 h-6 bg-gray-800 rounded-full border-2 border-gray-600 relative overflow-hidden shadow-inner mb-12">
-                            <div 
-                                className="h-full bg-gradient-to-r from-orange-600 to-yellow-500 transition-all duration-100 ease-out relative"
-                                style={{ width: `${(progress / currentWeapon.maxHp) * 100}%` }}
-                            >
-                                <div className="absolute inset-0 progress-shine"></div>
-                            </div>
-                            <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow-md">
-                                {Math.floor(progress)} / {currentWeapon.maxHp}
-                            </div>
-                        </div>
-
-                        {/* ANVIL (Click Area) */}
-                        <div 
-                            className={`
-                                relative cursor-pointer active:scale-95 transition-transform
-                                ${isHit ? 'hit-anim' : 'floating'}
-                            `}
-                            onMouseDown={handleAnvilClick}
-                            onTouchStart={(e) => {
-                                e.preventDefault(); // prevent zoom
-                                handleAnvilClick(e.touches[0]);
-                            }}
-                        >
-                            {/* Anvil Graphic (CSS Art or Emoji) */}
-                            <div className="w-48 h-32 bg-gray-700 rounded-lg relative shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-b-8 border-gray-900 flex items-center justify-center glow-box">
-                                <div className="text-6xl pointer-events-none">⬛</div>
-                                {/* Decorative details */}
-                                <div className="absolute top-0 w-full h-4 bg-gray-600 rounded-t-lg"></div>
-                                <div className="absolute -bottom-8 w-32 h-8 bg-gray-800 rounded-b-lg"></div>
-                            </div>
-                            
-                            {/* Helper Text */}
-                            <div className="absolute -bottom-16 left-0 right-0 text-center text-gray-400 animate-pulse text-sm">
-                                터치해서 단조하기
-                            </div>
-                        </div>
-
-                        {/* Particles Layer */}
-                        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                            <Sparks sparks={sparks} />
-                            {floatingTexts.map(ft => (
-                                <div 
-                                    key={ft.id} 
-                                    className={`float-text font-display ${ft.color} ${ft.size}`} 
-                                    style={{ left: ft.x, top: ft.y }}
-                                >
-                                    {ft.text}
+                        {/* --- TAB: ARTIFACTS --- */}
+                        {tab === 'ARTIFACT' && (
+                            <div className="flex-1 flex flex-col p-4 overflow-y-auto pb-20">
+                                <div className="text-center py-6">
+                                    <div className="inline-block p-4 rounded-full bg-purple-900/20 border border-purple-500/30 mb-2 shadow-[0_0_30px_rgba(147,51,234,0.2)]">
+                                        <div className="text-5xl animate-pulse filter drop-shadow-[0_0_10px_#a855f7]">🔮</div>
+                                    </div>
+                                    <h2 className="text-2xl font-display text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300">ANCIENT RELICS</h2>
+                                    <p className="text-xs text-purple-200/60 mt-1">영혼석을 바쳐 고대의 힘을 깨우세요</p>
                                 </div>
-                            ))}
-                        </div>
-                    </div>
 
-                    {/* UPGRADE PANEL */}
-                    <div className="h-2/5 bg-neutral-900 border-t-4 border-neutral-800 flex flex-col z-30 shadow-[0_-10px_50px_rgba(0,0,0,0.8)]">
-                        <div className="p-2 bg-neutral-800 text-center font-bold text-orange-500 border-b border-neutral-700 text-sm uppercase tracking-widest">
-                            대장간 업그레이드
-                        </div>
-                        <div className="flex-1 overflow-y-auto p-4 grid grid-cols-1 gap-3 pb-safe">
-                            {upgrades.map((u, idx) => {
-                                const cost = Math.floor(u.baseCost * Math.pow(1.6, u.level));
-                                const canAfford = gold >= cost;
-
-                                return (
-                                    <button 
-                                        key={u.id}
-                                        onClick={() => buyUpgrade(idx)}
-                                        disabled={!canAfford}
-                                        className={`
-                                            flex items-center p-3 rounded-lg border-2 transition-all
-                                            ${canAfford 
-                                                ? 'bg-neutral-800 border-neutral-700 hover:border-orange-500 hover:bg-neutral-750' 
-                                                : 'bg-neutral-900 border-neutral-800 opacity-50 grayscale'
-                                            }
-                                        `}
-                                    >
-                                        <div className="w-12 h-12 bg-black/30 rounded flex items-center justify-center text-2xl mr-4 border border-white/5">
-                                            {u.id === 'hammer_power' && '⚒️'}
-                                            {u.id === 'auto_goblin' && '👺'}
-                                            {u.id === 'furnace' && '🔥'}
-                                            {u.id === 'skill_crit' && '🎯'}
-                                            {u.id === 'mastery' && '📜'}
-                                        </div>
-                                        <div className="flex-1 text-left">
-                                            <div className="flex justify-between text-orange-100 font-bold">
-                                                <span>{u.name}</span>
-                                                <span className="text-xs bg-orange-900/50 px-2 py-0.5 rounded text-orange-300">Lv.{u.level}</span>
+                                <div className="grid grid-cols-1 gap-3">
+                                    {[
+                                        { id: 'luck', name: '행운의 여신상', desc: '상위 등급 제작 확률 증가', icon: '🍀', level: artifacts.luck, cost: (l) => (l+1)*10 },
+                                        { id: 'goldGain', name: '미다스의 손', desc: '골드 획득량 10% 증가', icon: '🖐️', level: artifacts.goldGain, cost: (l) => (l+1)*5 },
+                                        { id: 'dps', name: '전쟁의 북소리', desc: '영웅 공격력 20% 증가', icon: '🥁', level: artifacts.dps, cost: (l) => (l+1)*20 },
+                                    ].map(art => {
+                                        const cost = art.cost(art.level);
+                                        const canBuy = soulStones >= cost;
+                                        
+                                        return (
+                                            <div key={art.id} className="glass-card p-4 rounded-xl border-l-4 border-l-purple-500 flex items-center gap-4">
+                                                <div className="text-3xl filter drop-shadow-md grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all">
+                                                    {art.icon}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="flex justify-between items-center">
+                                                        <h3 className="font-bold text-purple-100">{art.name}</h3>
+                                                        <span className="text-xs bg-purple-900 text-purple-300 px-2 rounded-full">Lv.{art.level}</span>
+                                                    </div>
+                                                    <p className="text-xs text-gray-400 mt-1">{art.desc}</p>
+                                                </div>
+                                                <button 
+                                                    onClick={() => {
+                                                        if (canBuy) {
+                                                            setSoulStones(s => s - cost);
+                                                            setArtifacts(prev => ({...prev, [art.id]: prev[art.id] + 1}));
+                                                        }
+                                                    }}
+                                                    className={`px-4 py-2 rounded-lg font-bold text-xs border btn-press ${canBuy ? 'bg-purple-600 text-white border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.4)]' : 'bg-gray-800 text-gray-500 border-gray-700'}`}
+                                                >
+                                                    강화<br/>
+                                                    💎 {cost}
+                                                </button>
                                             </div>
-                                            <div className="text-xs text-gray-400 mt-1">{u.desc}</div>
-                                        </div>
-                                        <div className={`ml-4 font-mono font-bold ${canAfford ? 'text-yellow-400' : 'text-gray-600'}`}>
-                                            {cost.toLocaleString()} G
-                                        </div>
-                                    </button>
-                                )
-                            })}
-                            {/* Padding for scroll */}
-                            <div className="h-12"></div>
-                        </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                        )}
+                        
+                        <FloatingTexts texts={floatingTexts} />
                     </div>
 
+                    {/* BOTTOM NAVIGATION */}
+                    <div className="h-[70px] bg-black/90 backdrop-blur-md border-t border-white/10 flex justify-around items-center shrink-0 pb-2 z-50 relative">
+                        {[
+                            { id: 'SMITH', icon: '⚒️', label: '대장간' },
+                            { id: 'DUNGEON', icon: '⚔️', label: '원정대' },
+                            { id: 'ARTIFACT', icon: '🏛️', label: '유물' }
+                        ].map(item => (
+                            <button 
+                                key={item.id}
+                                onClick={() => setTab(item.id)}
+                                className={`flex flex-col items-center justify-center w-20 h-full transition-all duration-300 relative ${tab === item.id ? 'text-white' : 'text-gray-600'}`}
+                            >
+                                {tab === item.id && (
+                                    <div className="absolute -top-[1px] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white to-transparent shadow-[0_0_10px_#fff]"></div>
+                                )}
+                                <span className={`text-2xl mb-1 transition-transform duration-300 ${tab === item.id ? 'scale-110 -translate-y-1 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]' : ''}`}>
+                                    {item.icon}
+                                </span>
+                                <span className="text-[10px] font-bold tracking-wider">{item.label}</span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
             );
         };
@@ -461,4 +702,3 @@
     </script>
 </body>
 </html>
-    
