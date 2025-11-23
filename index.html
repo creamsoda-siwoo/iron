@@ -258,23 +258,108 @@
             const [itemSource, setItemSource] = useState(null); 
             const [isEquipMode, setIsEquipMode] = useState(false);
             const [showMastery, setShowMastery] = useState(false);
+            const [isSettingsOpen, setIsSettingsOpen] = useState(false);
             const [now, setNow] = useState(Date.now());
 
+            // --- SAVE/LOAD LOGIC ---
+            const stateRef = useRef({}); // Ref to hold current state for auto-save
+
+            // Update ref on render
             useEffect(() => {
-                if (ownedHeroes.length === 0) {
-                    const starter = {
-                        uid: Date.now(),
-                        defId: 'h1',
-                        level: 1,
-                        awaken: 0,
-                        equippedWeapon: null
-                    };
-                    setOwnedHeroes([starter]);
-                    setParty([starter.uid]);
+                stateRef.current = {
+                    gold, wpIdx, clickLv, autoLv, autoSellRank,
+                    inventory, ownedHeroes, party, stage, towerFloor,
+                    artifacts, mastery, skills
+                };
+            }, [gold, wpIdx, clickLv, autoLv, autoSellRank, inventory, ownedHeroes, party, stage, towerFloor, artifacts, mastery, skills]);
+
+            const saveGame = (manual = false) => {
+                try {
+                    localStorage.setItem('BS_WAR_V1', JSON.stringify(stateRef.current));
+                    if (manual) addText(window.innerWidth/2, window.innerHeight/2, "저장되었습니다!", "text-green-400 font-bold");
+                } catch (e) {
+                    console.error("Save failed", e);
                 }
-                const interval = setInterval(() => setNow(Date.now()), 100);
-                return () => clearInterval(interval);
+            };
+
+            const loadGame = () => {
+                try {
+                    const saved = localStorage.getItem('BS_WAR_V1');
+                    if (saved) {
+                        const data = JSON.parse(saved);
+                        if(data.gold !== undefined) setGold(data.gold);
+                        if(data.wpIdx !== undefined) setWpIdx(data.wpIdx);
+                        if(data.clickLv !== undefined) setClickLv(data.clickLv);
+                        if(data.autoLv !== undefined) setAutoLv(data.autoLv);
+                        if(data.autoSellRank !== undefined) setAutoSellRank(data.autoSellRank);
+                        if(data.inventory) setInventory(data.inventory);
+                        if(data.ownedHeroes) setOwnedHeroes(data.ownedHeroes);
+                        if(data.party) setParty(data.party);
+                        if(data.stage) {
+                            setStage(data.stage);
+                            setMobMaxHp(Math.floor(100 * Math.pow(1.35, data.stage)));
+                            setMobHp(Math.floor(100 * Math.pow(1.35, data.stage)));
+                        }
+                        if(data.towerFloor) setTowerFloor(data.towerFloor);
+                        if(data.artifacts) setArtifacts(data.artifacts);
+                        if(data.mastery) setMastery(data.mastery);
+                        if(data.skills) setSkills(data.skills);
+                    }
+                } catch (e) {
+                    console.error("Load failed", e);
+                }
+            };
+
+            const resetGame = () => {
+                if (confirm("정말 모든 데이터를 초기화하시겠습니까? (복구 불가)")) {
+                    localStorage.removeItem('BS_WAR_V1');
+                    window.location.reload();
+                }
+            };
+
+            useEffect(() => {
+                loadGame();
+                if (ownedHeroes.length === 0) {
+                    // This check might run before loadGame finishes in React 18 strict mode logic sometimes, 
+                    // but loadGame is synchronous here.
+                    // If loadGame found nothing, ownedHeroes is still empty array from useState init.
+                    // We need to wait? No, useState update is async.
+                    // Actually loadGame calls state setters.
+                    // Let's add a safe initialization for starter hero if persistent data didn't have heroes.
+                    // But we can't check ownedHeroes immediately after calling loadGame.
+                    // We'll rely on a separate effect or just check if loaded data was empty.
+                }
+                
+                // Auto-save every 30s
+                const saveTimer = setInterval(() => saveGame(false), 30000);
+                const loopTimer = setInterval(() => setNow(Date.now()), 100);
+                
+                return () => {
+                    clearInterval(saveTimer);
+                    clearInterval(loopTimer);
+                }
             }, []);
+
+            // Ensure starter hero exists if not loaded
+            useEffect(() => {
+                // If after load (or init) heroes are empty, add starter.
+                // Give a small delay or check inside loadGame would be better, but this works for now.
+                const t = setTimeout(() => {
+                    if (ownedHeroes.length === 0) {
+                        const starter = {
+                            uid: Date.now(),
+                            defId: 'h1',
+                            level: 1,
+                            awaken: 0,
+                            equippedWeapon: null
+                        };
+                        setOwnedHeroes([starter]);
+                        setParty([starter.uid]);
+                    }
+                }, 100);
+                return () => clearTimeout(t);
+            }, [ownedHeroes.length]);
+            // --- END SAVE/LOAD LOGIC ---
 
             const currentWp = WEAPONS[wpIdx] || WEAPONS[0];
             
@@ -660,10 +745,11 @@
                                 <span>💰</span> <span className="font-bold text-yellow-200 text-lg">{formatNum(gold)}</span>
                             </div>
                         </div>
-                        <div className="text-right">
-                            <div className="font-display text-lg text-gray-200 leading-none">
+                        <div className="flex items-center gap-3">
+                             <div className="font-display text-lg text-gray-200 leading-none">
                                 {tab === 'SMITH' ? '전설의 대장간' : tab === 'DUNGEON' ? (dungeonMode === 'TOWER' ? `무한의 탑 ${towerFloor}층` : `STAGE ${stage}`) : tab === 'INVENTORY' ? '모험가의 가방' : '상점'}
                             </div>
+                            <button onClick={() => setIsSettingsOpen(true)} className="text-2xl text-gray-400 hover:text-white transition-colors">⚙️</button>
                         </div>
                     </div>
 
@@ -995,6 +1081,28 @@
 
                         <FloatingTexts texts={texts} />
                         
+                        {/* SETTINGS MODAL */}
+                        {isSettingsOpen && (
+                            <div className="absolute inset-0 z-[110] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
+                                <div className="w-full max-w-sm glass-card p-6 rounded-2xl flex flex-col gap-4">
+                                    <h3 className="text-xl font-bold text-center text-white border-b border-white/10 pb-3">설정</h3>
+                                    
+                                    <div className="flex flex-col gap-2">
+                                        <button onClick={() => saveGame(true)} className="bg-blue-600 hover:bg-blue-500 py-3 rounded-lg font-bold text-white btn-press">
+                                            💾 현재 상태 저장하기
+                                        </button>
+                                        <p className="text-xs text-center text-gray-500 mb-2">※ 30초마다 자동 저장됩니다.</p>
+                                        
+                                        <button onClick={resetGame} className="bg-red-900/50 hover:bg-red-800/50 border border-red-500/50 py-3 rounded-lg font-bold text-red-200 btn-press">
+                                            ⚠️ 데이터 초기화 (Reset)
+                                        </button>
+                                    </div>
+                                    
+                                    <button onClick={() => setIsSettingsOpen(false)} className="mt-4 text-gray-400 hover:text-white text-sm">닫기</button>
+                                </div>
+                            </div>
+                        )}
+
                         {/* GACHA RESULT MODAL */}
                         {gachaResult && gachaResult.def && (
                             <div className="absolute inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center p-6" onClick={() => setGachaResult(null)}>
